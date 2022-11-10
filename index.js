@@ -23,12 +23,12 @@ app.get("/", (req, res) => {
 async function run() {
   try {
     const serviceCollection = client.db("getSnappy").collection("services");
+    const reviewCollection = client.db("getSnappy").collection("reviews");
 
     app.get("/services", async (req, res) => {
-      const isLimited = req.query.limited;
       const query = {};
       let count = 0;
-      if (isLimited) {
+      if (req.query.limited) {
         count = 3;
       }
       const cursor = serviceCollection.find(query).limit(count);
@@ -42,6 +42,31 @@ async function run() {
       const query = { _id: ObjectId(id) };
       const service = await serviceCollection.findOne(query);
       res.send(service);
+    });
+
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.send(result);
+      console.log(result);
+    });
+
+    app.get("/reviews", async (req, res) => {
+      let query = {};
+      if (req.query.id) {
+        query = {
+          serviceId: req.query.id,
+        };
+      }
+      if (req.query.email) {
+        query = {
+          email: req.query.email,
+        };
+      }
+      const cursor = reviewCollection.find(query);
+      const result = await cursor.toArray();
+      res.send(result);
+      console.log(result);
     });
   } finally {
   }
