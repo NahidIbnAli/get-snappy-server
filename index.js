@@ -34,7 +34,6 @@ async function run() {
       const cursor = serviceCollection.find(query).limit(count);
       const services = await cursor.toArray();
       res.send(services);
-      console.log(services);
     });
 
     app.get("/services/:id", async (req, res) => {
@@ -48,7 +47,6 @@ async function run() {
       const review = req.body;
       const result = await reviewCollection.insertOne(review);
       res.send(result);
-      console.log(result);
     });
 
     app.get("/reviews", async (req, res) => {
@@ -66,7 +64,13 @@ async function run() {
       const cursor = reviewCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
-      console.log(result);
+    });
+
+    app.delete("/reviews/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await orderCollection.deleteOne(query);
+      res.send(result);
     });
   } finally {
   }
